@@ -50,10 +50,11 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(student1);
      }
      @DeleteMapping("/deleteById/{id}")
-     public  ResponseEntity<Student> deleteStudentById(@PathVariable Integer id){
-        studentService.deleteStudentById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+     public  ResponseEntity<String> deleteStudentById(@PathVariable Integer id){
+       String deleteStudentById = studentService.deleteStudentById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(deleteStudentById);
      }
+
 
 
 }

@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -34,6 +35,8 @@ public class StudentControllerTest {
         Assertions.assertEquals("aaa", student1.getName());
         Assertions.assertEquals(25, student1.getAge());
         Assertions.assertEquals('f', student1.getGender());
+        Mockito.verify(studentService, Mockito.times(1)).insert(student);
+
 
 
     }
@@ -44,45 +47,74 @@ public class StudentControllerTest {
                 new Student(2, "bbb", 24, 'm'));
         Mockito.when(studentService.insertAllStudents(students)).thenReturn(students);
         ResponseEntity<List<Student>> responseEntity = studentController.insertAllStudents(students);
-        Integer statusCode = responseEntity.getStatusCode().value();
-        Assertions.assertEquals(statusCode, 201);
+        Assertions.assertNotNull(responseEntity);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertNotNull(responseEntity.getBody());
+        Assertions.assertEquals(2, responseEntity.getBody().size());
+        Assertions.assertEquals("xxx", responseEntity.getBody().get(0).getName());
+        Mockito.verify(studentService, Mockito.times(1)).insertAllStudents(students);
+
+
 
 
     }
-//    @Test
-//    public void testGetAllStudents() {
-//        List<Student> students = Arrays.asList();
-//        Mockito.when(studentService.getAllStudents()).thenReturn(students);
-//        ResponseEntity<List<Student>> responseEntity = studentController.findAllTheStudentss();
-//        Integer statusCode = responseEntity.getStatusCode().value();
-//        Assertions.assertEquals(statusCode, 200);
-//    }
-//    @Test
-//public void testGetStudentById() {
-//        Student student = new Student(1, "aaa", 25, 'f');
-//        Mockito.when(studentService.getStudentById(1)).thenReturn(student);
-//        ResponseEntity<Student> responseEntity=studentController.findByStudentId()
-//        Integer statusCode = responseEntity.getStatusCode().value();
-//        Assertions.assertEquals(statusCode, 200);
-//}
-//@Test
-//public void testUpdateStudent() {
-//        Student student = new Student(1, "aaa", 25, 'f');
-//        Mockito.when(studentService.updateStudent());
-//        ResponseEntity<Student> responseEntity=studentController.updateStudentById()
-//                Integer statusCode = responseEntity.getStatusCode().value();
-//        Assertions.assertEquals(statusCode, 200);
-//
-//
-//}
-//@Test
-//public void testDeleteStudentById() {
-//Student student = new Student(1, "aaa", 25, 'f');
-//Mockito.when(studentService.deleteStudentById(2));
-//ResponseEntity<Student> responseEntity=studentController.deleteStudentById()
-//        Integer statusCode = responseEntity.getStatusCode().value();
-//Assertions.assertEquals(statusCode, 200);
-//
-//}
+    @Test
+    public void testGetAllStudents() {
+        List<Student> students = Arrays.asList(new Student(1,"xxx",25,'f'),
+                new Student(2,"yyy",24,'m'));
+        Mockito.when(studentService.getAllStudents()).thenReturn(students);
+        ResponseEntity<List<Student>> responseEntity = studentController.findAllTheStudentss();
+        Assertions.assertNotNull(responseEntity);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertEquals(2, responseEntity.getBody().size());
+        Assertions.assertEquals("xxx", responseEntity.getBody().get(0).getName());
+        Mockito.verify(studentService, Mockito.times(1)).getAllStudents();
+
+
+
+
+    }
+    @Test
+public void testGetStudentById() {
+        Integer id = 1;
+        Student student = new Student(1, "aaa", 25, 'f');
+        Mockito.when(studentService.getStudentById(1)).thenReturn(student);
+        ResponseEntity<Student> responseEntity=studentController.findByStudentId(id);
+        Assertions.assertNotNull(responseEntity);
+        Assertions.assertEquals(HttpStatus.OK,responseEntity.getStatusCode());
+        Assertions.assertEquals(student,responseEntity.getBody());
+        Assertions.assertEquals("aaa", responseEntity.getBody().getName());
+        Assertions.assertEquals(25, responseEntity.getBody().getAge());
+        Assertions.assertEquals('f', responseEntity.getBody().getGender());
+        Mockito.verify(studentService, Mockito.times(1)).getStudentById(1);
+
+}
+@Test
+public void testUpdateStudent() {
+        Integer id = 1;
+        Student student = new Student(1, "aaa", 25, 'f');
+        Mockito.when(studentService.updateStudent(id ,student)).thenReturn(student);
+        ResponseEntity<Student> responseEntity=studentController.updateStudentById(id, student);
+                Assertions.assertNotNull(responseEntity);
+                Assertions.assertEquals(HttpStatus.ACCEPTED,responseEntity.getStatusCode());
+                Assertions.assertEquals(student,responseEntity.getBody());
+                Mockito.verify(studentService).updateStudent(id,student);
+
+
+}
+@Test
+public void testDeleteStudentById() {
+        Integer studentId = 1;
+
+String message = "delete student successfully";
+Mockito.when(studentService.deleteStudentById(studentId)).thenReturn(message);
+ResponseEntity<String> responseEntity=studentController.deleteStudentById(studentId);
+       Assertions.assertNull(responseEntity);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertEquals(message, responseEntity.getBody());
+        Mockito.verify(studentService, Mockito.times(1)).deleteStudentById(studentId);
+
+
+}
 
     }
